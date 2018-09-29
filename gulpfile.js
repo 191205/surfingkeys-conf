@@ -49,10 +49,10 @@ gulp.task("check-priv", () => {
 
 gulp.task("build", ["check-priv", "clean", "lint"], () => gulp.src(paths.entry, { read: false })
   .pipe(parcel())
-  .pipe(rename(".surfingkeys"))
+  .pipe(rename("surfingkeys.conf"))
   .pipe(gulp.dest("build")))
 
-gulp.task("install", ["build"], () => gulp.src("build/.surfingkeys")
+gulp.task("install", ["build"], () => gulp.src("build/surfingkeys.conf")
   .pipe(gulp.dest(os.homedir())))
 
 gulp.task("watch", () => {
