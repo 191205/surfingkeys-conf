@@ -1,6 +1,12 @@
 const completions = require("./completions")
 const { isElementInViewport } = require("./util")
-
+// -----------------------------------------------------------------------------------------------------------------------
+// // Surfingkeys: https://github.com/brookhong/Surfingkeys
+// // Config Originally From: https://github.com/b0o/surfingkeys-conf
+// // Dracula Theme: https://github.com/dracula/dracula-theme#color-palette
+// -----------------------------------------------------------------------------------------------------------------------
+// Map Keys
+// -----------------------------------------------------------------------------------------------------------------------
 // Unmap undesired defaults
 const unmaps = [
   "sb", "sw", "ob",
@@ -10,58 +16,21 @@ const unmaps = [
   "spi", "sfr", "zQ",
   "zz", "zR", "ab",
   "Q", "q", "ag",
-  "af", ";s", "yp",
+  ";s", "yp", "og", "oy"
 ]
-
 unmaps.forEach((u) => {
-  unmap(u)
+  unmap(u);
 })
-
 const rmSearchAliases =
   {
-    s: ["g", "d", "b",
-      "w", "s", "h"],
+    s: ["b"],
   }
 
 Object.keys(rmSearchAliases).forEach((k) => {
   rmSearchAliases[k].forEach((v) => {
-    removeSearchAliasX(v, k)
+    removeSearchAliasX(v, k);
   })
 })
-
-// ---- Settings ----//
-settings.hintAlign = "left"
-settings.omnibarSuggestionTimeout = 500
-settings.richHintsForKeystroke = 1
-
-// ---- Theme ----//
-settings.theme = `
-    /* Disable RichHints CSS animation */
-    .expandRichHints {
-        animation: 0s ease-in-out 1 forwards expandRichHints;
-    }
-    .collapseRichHints {
-        animation: 0s ease-in-out 1 forwards collapseRichHints;
-    }
-`
-
-// ---- Maps ----//
-// Left-hand aliases
-// Movement
-map("w", "k")
-map("s", "j")
-
-// Right-hand aliases
-// Tab Navigation
-map("J", "E")
-map("K", "R")
-
-// History
-map("H", "S")
-map("L", "D")
-
-
-// ---- Functions ----//
 
 const vimEditURL = () => Front
   .showEditor(window.location.href, (data) => {
@@ -305,27 +274,6 @@ mapsitekeys("news.ycombinator.com", [
   ["p", "Go to parent", hnGoParent],
 ])
 
-const dribbbleAttachment = cb =>
-  Hint(".attachments .thumb", a => cb(a.src.replace("/thumbnail/", "/")))
-
-mapsitekeys("dribbble.com", [
-  ["s", "Heart Shot", Hint(".toggle-fav, .like-shot")],
-  ["a", "View shot", Hint(".dribbble-over, .gif-target, .more-thumbs a")],
-  ["A", "View shot", Hint(".dribbble-over, .gif-target, .more-thumbs a")],
-  ["v", "View attachment image", dribbbleAttachment(a => tabOpenLink(a))],
-  ["V", "Yank attachment image source URL", dribbbleAttachment(a => Clipboard.write(a))],
-  ["z", "Zoom shot", Hint(".single-img picture, .detail-shot img")],
-])
-
-const behanceAddToCollection = () => document.querySelector(".qa-action-collection").click()
-
-mapsitekeys("behance.net", [
-  ["s", "Appreciate project", Hint(".appreciation-button")],
-  ["b", "Add project to collection", behanceAddToCollection],
-  ["a", "View project", Hint(".rf-project-cover__title")],
-  ["A", "View project", Hint(".rf-project-cover__title")],
-])
-
 const wpToggleSimple = () => {
   window.location.hostname = window.location.hostname.split(".")
     .map((s, i) => {
@@ -342,7 +290,7 @@ mapsitekeys("wikipedia.org", [
 
 // ---- Search & completion ----//
 // Search leader
-const sl = "a"
+const sl = "o"
 
 // Register Search Engine Completions
 // The `completions` variable is defined in `completions.js` and
@@ -355,4 +303,212 @@ Object.keys(completions).forEach((k) => {
   mapkey(la, `#8Search ${s.name}`, () => Front.openOmnibar({ type: "SearchEngine", extra: s.alias }))
 })
 
-// vim: set ft=javascript expandtab:
+// -----------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------
+cmap('<Ctrl-j>', '<Tab>');
+cmap('<Ctrl-k>', '<Shift-Tab>');
+unmap('w'); // By default this opens current tab in a new window, which I don't like
+map('w', 'cs'); // Instead this focuses the main pane
+map('oo', 'ago'); // 'oo' is now like 'o' in vimium, open in this tab
+map('O', 'ago'); // 'oo' is now like 'o' in vimium, open in this tab
+// map('b', 'T'); // Go through buffers (tabs)
+// map('B', 'b'); // Go through bookmarks
+map('<Ctrl-d>', 'd'); // scroll half-page down
+map('<Ctrl-u>', 'e'); // scroll half-page up
+map('h', 'S'); // go back in history
+map('l', 'D'); // go forward in history
+map('<Ctrl-l>', 'R'); // next tab
+map('<Ctrl-h>', 'E'); // previous tab
+map('l', 'R'); // next tab
+map('h', 'E'); // previous tab
+map('u', 'X'); // restore closed tab
+// -----------------------------------------------------------------------------------------------------------------------
+// Settings
+// -----------------------------------------------------------------------------------------------------------------------
+settings.useLocalMarkdownAPI = false;
+settings.hintAlign = "left";
+settings.focusFirstCandidate = true;
+settings.modeAfterYank = "Normal";
+settings.scrollStepSize = 140;
+settings.focusAfterClosed = "left";
+settings.richHintsForKeystroke = 1;
+settings.newTabPosition = "last";
+// -----------------------------------------------------------------------------------------------------------------------
+// ACE Vim
+// -----------------------------------------------------------------------------------------------------------------------
+aceVimMap('ZQ', ':q!', 'normal');
+aceVimMap('ZZ', ':wq', 'normal');
+aceVimMap('Y', 'y$', 'insert');
+// -----------------------------------------------------------------------------------------------------------------------
+// Change hints styles
+// -----------------------------------------------------------------------------------------------------------------------
+// Hints.characters = '1234567890';
+Hints.characters = "asdfgqwertvbn";
+Hints.style('border: solid 1px #ff79c6; color:#44475a; background: #f1fa8c; background-color: #f1fa8c; font-size: 10pt; font-family: "Fira Code"');
+Hints.style('border: solid 8px #ff79c6;padding: 1px;background: #f1fa8c; font-family: "Fira Code"', "text");
+// -----------------------------------------------------------------------------------------------------------------------
+// Change search marks and cursor
+// -----------------------------------------------------------------------------------------------------------------------
+Visual.style('marks', 'background-color: #f1fa8c;');
+Visual.style('cursor', 'background-color: #6272a4; color: #f8f8f2');
+// -----------------------------------------------------------------------------------------------------------------------
+// Change theme
+// -----------------------------------------------------------------------------------------------------------------------
+settings.theme = `
+/* Disable RichHints CSS animation */
+.expandRichHints {
+    animation: 0s ease-in-out 1 forwards expandRichHints;
+}
+.collapseRichHints {
+    animation: 0s ease-in-out 1 forwards collapseRichHints;
+}
+.sk_theme input {
+    font-family: "Fira Code";
+}
+.sk_theme .url {
+    font-size: 10px;
+}
+#sk_omnibarSearchResult li div.url {
+    font-weight: normal;
+}
+.sk_theme .omnibar_timestamp {
+    font-size: 11px;
+    font-weight: bold;
+}
+.sk_theme .omnibar_visitcount {
+    font-size: 11px;
+    font-weight: bold;
+}
+body {
+    font-family: "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 14px;
+}
+kbd {
+    font: 11px "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+#sk_omnibarSearchArea .prompt, #sk_omnibarSearchArea .resultPage {
+    font-size: 12px;
+}
+.sk_theme {
+    background: #282a36;
+    color: #f8f8f2;
+}
+.sk_theme tbody {
+    color: #ff5555;
+}
+.sk_theme input {
+    color: #ffb86c;
+}
+.sk_theme .url {
+    color: #6272a4;
+}
+#sk_omnibarSearchResult>ul>li {
+    background: #282a36;
+}
+#sk_omnibarSearchResult>ul>li:nth-child(odd) {
+    background: #282a36;
+}
+.sk_theme .annotation {
+    color: #6272a4;
+}
+.sk_theme .focused {
+    background: #44475a !important;
+}
+.sk_theme kbd {
+    background: #f8f8f2;
+    color: #44475a;
+}
+.sk_theme .frame {
+    background: #8178DE9E;
+}
+.sk_theme .omnibar_highlight {
+    color: #8be9fd;
+}
+.sk_theme .omnibar_folder {
+    color: #ff79c6;
+}
+.sk_theme .omnibar_timestamp {
+    color: #bd93f9;
+}
+.sk_theme .omnibar_visitcount {
+    color: #f1fa8c;
+}
+.sk_theme #sk_omnibarSearchResult>ul>li:nth-child(odd) {
+    background: #282a36;
+}
+.sk_theme .prompt, .sk_theme .resultPage {
+    color: #50fa7b;
+}
+.sk_theme .feature_name {
+    color: #ff5555;
+}
+.sk_omnibar_middle #sk_omnibarSearchArea {
+    border-bottom: 1px solid #282a36;
+}
+#sk_status {
+    border: 1px solid #282a36;
+}
+#sk_richKeystroke {
+    background: #282a36;
+    box-shadow: 0px 2px 10px rgba(40, 42, 54, 0.8);
+}
+#sk_richKeystroke kbd>.candidates {
+    color: #ff5555;
+}
+#sk_keystroke {
+    background-color: #282a36;
+    color: #f8f8f2;
+}
+kbd {
+    border: solid 1px #f8f8f2;
+    border-bottom-color: #f8f8f2;
+    box-shadow: inset 0 -1px 0 #f8f8f2;
+}
+#sk_frame {
+    border: 4px solid #ff5555;
+    background: #8178DE9E;
+    box-shadow: 0px 0px 10px #DA3C0DCC;
+}
+#sk_banner {
+    border: 1px solid #282a36;
+    background: rgb(68, 71, 90);
+}
+div.sk_tabs_bg {
+    background: #f8f8f2;
+}
+div.sk_tab {
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#6272a4), color-stop(100%,#44475a));
+}
+div.sk_tab_title {
+    color: #f8f8f2;
+}
+div.sk_tab_url {
+    color: #8be9fd;
+}
+div.sk_tab_hint {
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f1fa8c), color-stop(100%,#ffb86c));
+    color: #282a36;
+    border: solid 1px #282a36;
+}
+#sk_bubble {
+    border: 1px solid #f8f8f2;
+    color: #282a36;
+    background-color: #f8f8f2;
+}
+#sk_bubble * {
+    color: #282a36 !important;
+}
+div.sk_arrow[dir=down]>div:nth-of-type(1) {
+    border-top: 12px solid #f8f8f2;
+}
+div.sk_arrow[dir=up]>div:nth-of-type(1) {
+    border-bottom: 12px solid #f8f8f2;
+}
+div.sk_arrow[dir=down]>div:nth-of-type(2) {
+    border-top: 10px solid #f8f8f2;
+}
+div.sk_arrow[dir=up]>div:nth-of-type(2) {
+    border-bottom: 10px solid #f8f8f2;
+}
+}`
+
