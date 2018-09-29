@@ -1,32 +1,17 @@
 const gulp = require("gulp")
 const parcel = require("gulp-parcel")
-const replace = require("gulp-replace")
 const rename = require("gulp-rename")
 const eslint = require("gulp-eslint")
-const path = require("path")
 const del = require("del")
 const os = require("os")
 const fs = require("fs")
 const { spawn } = require("child_process")
-const { URL } = require("url")
 
 const paths = {
-  scripts:     ["conf.priv.js", "completions.js", "conf.js"],
-  entry:       "conf.js",
-  gulpfile:    ["gulpfile.js"],
-  readme:      ["README.tmpl.md"],
-  screenshots: "assets/screenshots",
+  scripts:  ["conf.priv.js", "completions.js", "conf.js"],
+  entry:    "conf.js",
+  gulpfile: ["gulpfile.js"],
 }
-
-// This notice will be injected into the generated README.md file
-const disclaimer = `\
-<!--
-
-NOTICE:
-This is an automatically generated file - Do not edit it directly.
-The source file is README.tmpl.md
-
--->`
 
 gulp.task("gulp-autoreload", () => {
   let p
@@ -62,7 +47,7 @@ gulp.task("check-priv", () => {
   }
 })
 
-gulp.task("build", ["check-priv", "clean", "lint", "readme"], () => gulp.src(paths.entry, { read: false })
+gulp.task("build", ["check-priv", "clean", "lint"], () => gulp.src(paths.entry, { read: false })
   .pipe(parcel())
   .pipe(rename(".surfingkeys"))
   .pipe(gulp.dest("build")))
@@ -71,53 +56,11 @@ gulp.task("install", ["build"], () => gulp.src("build/.surfingkeys")
   .pipe(gulp.dest(os.homedir())))
 
 gulp.task("watch", () => {
-  gulp.watch([].concat(paths.scripts, paths.gulpfile), ["readme", "install"])
-  gulp.watch(paths.readme, ["readme"])
+  gulp.watch([].concat(paths.scripts, paths.gulpfile), ["install"])
 })
 
 gulp.task("watch-nogulpfile", () => {
-  gulp.watch([].concat(paths.scripts), ["readme", "install"])
-  gulp.watch(paths.readme, ["readme"])
-})
-
-gulp.task("readme", () => {
-  const compl = require("./completions") // eslint-disable-line global-require
-  const screens = {}
-  let screenshotList = ""
-  fs.readdirSync(path.join(__dirname, paths.screenshots)).forEach((s) => {
-    const file = path.basename(s, ".png").split("-")
-    const alias = file[0]
-    if (!screens[alias]) {
-      screens[alias] = []
-    }
-    screens[alias].push(path.join(paths.screenshots, path.basename(s)))
-  })
-  const table = Object.keys(compl).sort((a, b) => {
-    if (a < b) return -1
-    if (a > b) return 1
-    return 0
-  }).reduce((a, k) => {
-    const c = compl[k]
-    const u = new URL(c.search)
-    const domain = (u.hostname === "cse.google.com") ? "Google Custom Search" : u.hostname
-    let s = ""
-    if (screens[c.alias]) {
-      screens[c.alias].forEach((url, i) => {
-        const num = (i > 0) ? ` ${i + 1}` : ""
-        s += `[:framed_picture:](#${c.name}${num.replace(" ", "-")}) `
-        screenshotList += `##### ${c.name}${num}\n`
-        screenshotList += `![${c.name} screenshot](./${url})\n\n`
-      })
-    }
-    return `${a}| \`${c.alias}\` | \`${c.name}\` | \`${domain}\` | ${s} |\n`
-  }, "")
-  return gulp.src(["./README.tmpl.md"])
-    .pipe(replace("<!--{{DISCLAIMER}}-->", disclaimer))
-    .pipe(replace("<!--{{COMPL_COUNT}}-->", Object.keys(compl).length))
-    .pipe(replace("<!--{{COMPL_TABLE}}-->", table))
-    .pipe(replace("<!--{{SCREENSHOTS}}-->", screenshotList))
-    .pipe(rename("README.md"))
-    .pipe(gulp.dest("."))
+  gulp.watch([].concat(paths.scripts), ["install"])
 })
 
 gulp.task("default", ["build"])
